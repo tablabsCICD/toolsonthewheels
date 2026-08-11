@@ -1,0 +1,12 @@
+{
+  "name": "tools-on-the-wheels",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tools on the Wheels website — static frontend + Express booking-email backend",
+  "scripts": {
+    "install:server": "npm install --prefix server",
+    "install:server:prod": "npm ci --omit=dev --prefix server",
+    "start": "npm start --prefix server",
+    "dev": "npm run dev --prefix server"
+  }
+}
