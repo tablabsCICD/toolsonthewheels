@@ -11,6 +11,31 @@ const logger = require('./utils/logger');
 
 const FRONTEND_ROOT = path.join(__dirname, '..', '..', 'public');
 
+function isLoopbackOrigin(origin) {
+  return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/.test(origin);
+}
+
+function buildCorsOptions() {
+  if (env.corsOrigin === '*') return { origin: '*' };
+
+  const allowedOrigins = env.corsOrigin
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  return {
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+
+      // Local file previews send Origin: null. Allow that only when the configured
+      // API origin is loopback, so public/index.html can submit during local testing.
+      if (origin === 'null' && allowedOrigins.some(isLoopbackOrigin)) return callback(null, true);
+
+      return callback(null, allowedOrigins.includes(origin));
+    },
+  };
+}
+
 function createApp() {
   const app = express();
 
@@ -26,8 +51,7 @@ function createApp() {
     })
   );
 
-  const allowedOrigins = env.corsOrigin === '*' ? '*' : env.corsOrigin.split(',').map((o) => o.trim());
-  app.use(cors({ origin: allowedOrigins }));
+  app.use(cors(buildCorsOptions()));
 
   // Frontend always sends JSON (see js/script.js) — no urlencoded parser needed.
   app.use(express.json({ limit: '20kb' }));

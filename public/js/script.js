@@ -5,6 +5,21 @@ menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classL
 const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.1});
 document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%4*55)+'ms';io.observe(el);});
 const CONSULT_FIELD_MAP={name:'cn',phone:'cp',email:'ce',date:'cd',time:'ct',service:'cs',notes:'cm'};
+const CONSULT_API_PATH='/api/appointments';
+const LOCAL_CONSULT_API_ORIGIN='http://localhost:3000';
+function redirectFilePreviewToLocalServer(){
+  if(window.location.protocol!=='file:') return;
+  fetch(LOCAL_CONSULT_API_ORIGIN+'/api/health',{cache:'no-store'})
+    .then(res=>{if(res.ok) window.location.replace(LOCAL_CONSULT_API_ORIGIN+'/'+window.location.hash);})
+    .catch(()=>{});
+}
+function getConsultApiEndpoint(){
+  const configured=document.documentElement.getAttribute('data-consult-api-endpoint')||'';
+  if(configured.trim()) return configured.trim();
+  if(window.location.protocol==='file:') return LOCAL_CONSULT_API_ORIGIN+CONSULT_API_PATH;
+  return CONSULT_API_PATH;
+}
+redirectFilePreviewToLocalServer();
 Object.values(CONSULT_FIELD_MAP).forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.addEventListener('input',()=>el.classList.remove('field-error'));
@@ -26,7 +41,7 @@ document.getElementById('consultForm').addEventListener('submit',async function(
   submitBtn.textContent='Sending…';
 
   try{
-    const res=await fetch('/api/appointments',{
+    const res=await fetch(getConsultApiEndpoint(),{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -60,7 +75,9 @@ document.getElementById('consultForm').addEventListener('submit',async function(
       statusEl.classList.add('is-error');
     }
   }catch(err){
-    statusEl.textContent="Couldn't reach the server. Please check your connection and try again, or call us directly.";
+    statusEl.textContent=window.location.protocol==='file:'
+      ? "Couldn't reach the booking server. Start it with npm start and open http://localhost:3000, then submit the form again."
+      : "Couldn't reach the server. Please check your connection and try again, or call us directly.";
     statusEl.classList.add('is-error');
   }finally{
     submitBtn.disabled=false;
