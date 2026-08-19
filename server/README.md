@@ -1,8 +1,8 @@
 # Tools on the Wheels — Backend
 
-Express API that powers the appointment-booking email notifications for the
-consultation form on the website. It also serves the existing static frontend
-(`../public`) so the whole site runs from a single process/port.
+Legacy/local Express API for the appointment-booking email notifications. The
+deployed shared-hosting site now uses `api/appointments.php`, but this Node
+server is still useful for local previews and as a reference implementation.
 
 ## What it does
 
@@ -49,16 +49,20 @@ server/
 cd server
 npm install
 cp .env.example .env
-# edit .env with real values (see "Choosing a provider" below)
+# edit .env with real values (see "SMTP email" below)
 npm start          # or: npm run dev  (auto-restarts on file changes)
 ```
 
 The server serves the site at `http://localhost:PORT/` (default port `3000`)
 and the API at `http://localhost:PORT/api/appointments`.
 
-## GoDaddy/cPanel entrypoint
+## Legacy Node entrypoint
 
-GoDaddy/cPanel Application Manager should use:
+Only use this if you intentionally deploy the Express backend instead of the
+PHP endpoint. For ordinary shared-hosting deployment, upload the root site files
+and `api/appointments.php` as described in the root README.
+
+If a host supports Node/Passenger, its Application Manager would use:
 
 - Application root/path: `toolsonthewheels/server`
 - Startup file: `app.js`
@@ -70,8 +74,8 @@ commonly expects an `app.js` startup file.
 
 ## SMTP email
 
-For the GoDaddy deployment, keep `EMAIL_PROVIDER=smtp` in `.env` and leave the
-existing SMTP service values in place:
+For the legacy Node backend, keep `EMAIL_PROVIDER=smtp` in `.env` and leave
+the existing SMTP service values in place:
 
 ```env
 EMAIL_PROVIDER=smtp

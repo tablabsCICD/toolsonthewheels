@@ -107,14 +107,31 @@ section.block{padding:90px 0}
 .rating-card .score{font-family:var(--disp);font-size:48px;font-weight:700;color:var(--gold);line-height:1}
 .rating-card .gword{font-family:var(--disp);text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--muted)}
 .stars{color:var(--gold);letter-spacing:3px;font-size:18px}
-.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.rev{background:var(--ink-2);border:1px solid var(--line);border-radius:4px;padding:28px 26px;display:flex;flex-direction:column;gap:14px}
+form#reviewForm{max-width:640px;margin:0 auto 40px}
+.star-input{display:flex;gap:6px}
+.star-btn{background:none;border:none;padding:2px;cursor:pointer;font-size:28px;line-height:1;color:var(--line-strong);transition:.15s;font-family:inherit}
+.star-btn:hover,.star-btn:focus-visible{color:var(--gold-bright)}
+.star-btn.on{color:var(--gold)}
+.star-btn.field-error{color:#e29a8c}
+
+.rev-rail-wrap{position:relative}
+.rev-rail{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 4px 16px;scrollbar-color:var(--gold-deep) var(--ink-2)}
+.rev-rail::-webkit-scrollbar{height:8px}
+.rev-rail::-webkit-scrollbar-track{background:var(--ink-2);border-radius:4px}
+.rev-rail::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:4px}
+.rev-rail-note{color:var(--muted);font-size:15px;padding:20px 4px}
+.rev{background:var(--ink-2);border:1px solid var(--line);border-radius:4px;padding:28px 26px;display:flex;flex-direction:column;gap:14px;flex:0 0 auto;width:320px;scroll-snap-align:start;transition:border-color .3s,box-shadow .3s}
+.rev.is-mine{border-color:var(--gold)}
+.rev-mine-tag{font-family:var(--disp);text-transform:uppercase;letter-spacing:.14em;font-size:10px;color:var(--gold)}
+.rev.just-saved{animation:rev-highlight 2.4s ease}
+@keyframes rev-highlight{0%,35%{box-shadow:0 0 0 3px rgba(203,170,108,.55)}100%{box-shadow:0 0 0 0 rgba(203,170,108,0)}}
 .rev .head{display:flex;align-items:center;gap:13px}
-.rev .av{width:44px;height:44px;border-radius:50%;background:var(--gold);color:#1a160f;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:18px}
+.rev .av{width:44px;height:44px;border-radius:50%;background:var(--gold);color:#1a160f;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:18px;flex:0 0 auto}
+.rev .who{min-width:0}
 .rev .who b{display:block;color:var(--cream);font-size:15px}
 .rev .who span{font-size:12px;color:var(--muted)}
 .rev .stars{font-size:15px}
-.rev p{color:var(--muted);font-size:15px}
+.rev p{color:var(--muted);font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
 .rev .src{font-family:var(--disp);text-transform:uppercase;letter-spacing:.16em;font-size:10px;color:var(--gold-deep);margin-top:auto}
 
 /* trusted-by band */
@@ -224,8 +241,19 @@ form .btn{justify-content:center;margin-top:6px}
 .form-status{font-size:14px;text-align:center;min-height:1.2em;font-family:var(--body)}
 .form-status.is-success{color:var(--gold)}
 .form-status.is-error{color:#e29a8c}
+.form-status-contact{margin-top:6px;font-size:14px}
+.form-status-contact a{color:var(--gold);text-decoration:underline}
 .btn[disabled]{opacity:.6;cursor:not-allowed;pointer-events:none}
 form input.field-error,form select.field-error,form textarea.field-error{border-color:#e29a8c!important}
+
+/* #consultForm is sized 10% smaller than other forms on the page — see the "Schedule a
+   Consultation" card-size request; scoped so it doesn't shrink other forms (e.g. reviews). */
+#consultForm{gap:12.6px;padding:28.8px;max-width:90%}
+#consultForm .form-row{gap:12.6px}
+#consultForm label{font-size:10px;margin-bottom:-6px}
+#consultForm input,#consultForm select,#consultForm textarea{padding:11.7px 12.6px;font-size:13.5px}
+#consultForm textarea{min-height:86px}
+#consultForm .btn{margin-top:5.4px}
 
 /* footer */
 footer{background:#000;border-top:1px solid var(--line);padding:64px 0 0}
@@ -257,7 +285,7 @@ footer ul li a:hover{color:var(--gold);padding-left:4px}
   .trust{justify-content:center}
   .hero-badge{order:-1}
   .about .grid,.area .grid,.contact .grid,.consult .grid{grid-template-columns:1fr;gap:38px}
-  .svc-grid,.why .grid,.rev-grid,.work-grid{grid-template-columns:repeat(2,1fr)}
+  .svc-grid,.why .grid,.work-grid{grid-template-columns:repeat(2,1fr)}
   .work-reels{grid-template-columns:repeat(2,1fr)}
   .steps{grid-template-columns:1fr 1fr}
   .step:nth-child(2){border-right:0}
@@ -276,12 +304,13 @@ footer ul li a:hover{color:var(--gold);padding-left:4px}
   .hero h1{font-size:clamp(30px,8.5vw,46px);word-break:break-word}
   .hero-badge .logo-mark{width:min(300px,72%)}
   .hero-badge .ring{width:104%}
-  .svc-grid,.why .grid,.steps,.about-stats,.fgrid,.rev-grid,.work-grid{grid-template-columns:1fr}
+  .svc-grid,.why .grid,.steps,.about-stats,.fgrid,.work-grid{grid-template-columns:1fr}
   .work-reels{grid-template-columns:repeat(2,1fr)}
   .step{border-right:0}
   .rating-card{flex-wrap:wrap;justify-content:center;text-align:center;padding:18px 22px}
   .rating-card .btn{margin-left:0;width:100%;justify-content:center}
   form .form-row{grid-template-columns:1fr}
+  .rev{width:78vw}
   section.block{padding:64px 0}
 }
 @media(max-width:430px){

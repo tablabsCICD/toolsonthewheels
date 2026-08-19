@@ -5,11 +5,13 @@ const cors = require('cors');
 
 const env = require('./config/env');
 const appointmentsRoutes = require('./routes/appointments.routes');
+const reviewsRoutes = require('./routes/reviews.routes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
-const FRONTEND_ROOT = path.join(__dirname, '..', '..', 'public');
+const FRONTEND_ROOT = path.join(__dirname, '..', '..');
+const STATIC_DIRS = ['assets', 'css', 'js'];
 
 function isLoopbackOrigin(origin) {
   return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/.test(origin);
@@ -28,7 +30,7 @@ function buildCorsOptions() {
       if (!origin) return callback(null, true);
 
       // Local file previews send Origin: null. Allow that only when the configured
-      // API origin is loopback, so public/index.html can submit during local testing.
+      // API origin is loopback, so index.html can submit during local testing.
       if (origin === 'null' && allowedOrigins.some(isLoopbackOrigin)) return callback(null, true);
 
       return callback(null, allowedOrigins.includes(origin));
@@ -63,9 +65,15 @@ function createApp() {
 
   app.get('/api/health', (_req, res) => res.json({ success: true, status: 'ok' }));
   app.use('/api/appointments', appointmentsRoutes);
+  app.use('/api/reviews', reviewsRoutes);
 
-  // Serve the static frontend from ../../public (index.html, css/, js/, assets/) untouched.
-  app.use(express.static(FRONTEND_ROOT));
+  // Serve only the flattened frontend files, not the rest of the project root.
+  STATIC_DIRS.forEach((dir) => {
+    app.use(`/${dir}`, express.static(path.join(FRONTEND_ROOT, dir)));
+  });
+  app.get(['/', '/index.html'], (_req, res) => {
+    res.sendFile(path.join(FRONTEND_ROOT, 'index.html'));
+  });
 
   app.use(notFound);
   app.use(errorHandler);

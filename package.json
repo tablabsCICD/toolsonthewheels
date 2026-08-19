@@ -2,11 +2,12 @@
   "name": "tools-on-the-wheels",
   "version": "1.0.0",
   "private": true,
-  "description": "Tools on the Wheels website — static frontend + Express booking-email backend",
+  "description": "Tools on the Wheels website — static frontend + PHP booking-email endpoint",
   "scripts": {
     "install:server": "npm install --prefix server",
     "install:server:prod": "npm ci --omit=dev --prefix server",
-    "start": "npm start --prefix server",
-    "dev": "npm run dev --prefix server"
+    "start": "printf 'Production uses PHP now. Upload index.html, css/, js/, assets/, api/, and .htaccess to your web root; do not run the legacy Node server for deployment.\\n'",
+    "start:node": "npm start --prefix server",
+    "dev:node": "npm run dev --prefix server"
   }
 }

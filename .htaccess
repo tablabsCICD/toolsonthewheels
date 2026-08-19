@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^api/appointments/?$ api/appointments.php [L]
+  RewriteRule ^api/reviews/?$ api/reviews.php [L]
+  RewriteRule ^api/health/?$ api/health.php [L]
+  RewriteRule (^|/)\.git(/|$) - [F,L]
+  RewriteRule ^(server|node_modules)(/|$) - [F,L]
+  RewriteRule ^api/data(/|$) - [F,L]
+</IfModule>
+
+<FilesMatch "^\.env">
+  Require all denied
+</FilesMatch>

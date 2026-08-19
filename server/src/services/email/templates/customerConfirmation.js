@@ -20,6 +20,8 @@ function customerConfirmationTemplate(booking, { businessName, businessPhone }) 
     <p style="margin:0 0 4px;">We've received your consultation request and a member of our team will contact you shortly to confirm your appointment.</p>
     <p style="margin:12px 0 4px;color:${COLORS.MUTED};font-size:13px;text-transform:uppercase;letter-spacing:1px;">Your request</p>
     ${detailsTable(rows)}
+    <p style="margin:18px 0 4px;color:${COLORS.MUTED};font-size:13px;text-transform:uppercase;letter-spacing:1px;">Project details</p>
+    <p style="margin:0;white-space:pre-wrap;">${booking.notes ? escapeHtml(booking.notes) : `<span style="color:${COLORS.MUTED}">None provided</span>`}</p>
     <p style="margin:18px 0 0;color:${COLORS.MUTED};">Questions in the meantime? Call or text us at ${escapeHtml(businessPhone)}.</p>
   `;
 
@@ -34,6 +36,9 @@ function customerConfirmationTemplate(booking, { businessName, businessPhone }) 
     `Service: ${booking.service}`,
     `Preferred date: ${booking.date}`,
     `Preferred time: ${booking.time}`,
+    '',
+    'Project details:',
+    booking.notes || 'None provided',
     '',
     `Questions in the meantime? Call or text us at ${businessPhone}.`,
   ].join('\n');
