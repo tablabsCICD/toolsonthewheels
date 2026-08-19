@@ -142,11 +142,7 @@ function formatReviewDate(iso){
   const d=new Date(iso);
   return Number.isNaN(d.getTime())?'':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
 }
-function buildReviewCard(review,isMine){
-  const card=document.createElement('div');
-  card.className='rev'+(isMine?' is-mine':'');
-  card.dataset.reviewId=review.id;
-
+function buildReviewHead(review){
   const head=document.createElement('div');
   head.className='head';
   const av=document.createElement('div');
@@ -160,7 +156,14 @@ function buildReviewCard(review,isMine){
   dateEl.textContent=formatReviewDate(review.createdAt);
   who.append(nameEl,dateEl);
   head.append(av,who);
-  card.appendChild(head);
+  return head;
+}
+
+function buildReviewCard(review,isMine){
+  const card=document.createElement('div');
+  card.className='rev'+(isMine?' is-mine':'');
+  card.dataset.reviewId=review.id;
+  card.appendChild(buildReviewHead(review));
 
   if(isMine){
     const tag=document.createElement('div');
@@ -176,8 +179,17 @@ function buildReviewCard(review,isMine){
   card.appendChild(stars);
 
   const text=document.createElement('p');
+  text.className='rev-text';
   text.textContent=review.text;
   card.appendChild(text);
+
+  const readMoreBtn=document.createElement('button');
+  readMoreBtn.type='button';
+  readMoreBtn.className='rev-readmore';
+  readMoreBtn.textContent='Read more';
+  readMoreBtn.hidden=true;
+  readMoreBtn.addEventListener('click',()=>openReviewModal(review,isMine));
+  card.appendChild(readMoreBtn);
 
   if(review.updatedAt && review.updatedAt!==review.createdAt){
     const src=document.createElement('div');
@@ -187,6 +199,73 @@ function buildReviewCard(review,isMine){
   }
   return card;
 }
+
+/** Shows "Read more" only for cards whose review text actually overflows the 5-line clamp. */
+function revealOverflowingReadMoreButtons(){
+  document.querySelectorAll('#reviewsRail .rev').forEach(card=>{
+    const text=card.querySelector('.rev-text');
+    const btn=card.querySelector('.rev-readmore');
+    if(text && btn) btn.hidden=text.scrollHeight<=text.clientHeight+1;
+  });
+}
+
+function buildReviewModalContent(review,isMine){
+  const wrap=document.createElement('div');
+  wrap.appendChild(buildReviewHead(review));
+
+  if(isMine){
+    const tag=document.createElement('div');
+    tag.className='rev-mine-tag';
+    tag.textContent='Your review';
+    wrap.appendChild(tag);
+  }
+
+  const stars=document.createElement('div');
+  stars.className='stars';
+  stars.setAttribute('aria-label',review.rating+' out of 5 stars');
+  stars.textContent=renderStars(review.rating);
+  wrap.appendChild(stars);
+
+  const text=document.createElement('p');
+  text.textContent=review.text;
+  wrap.appendChild(text);
+
+  if(review.updatedAt && review.updatedAt!==review.createdAt){
+    const src=document.createElement('div');
+    src.className='src';
+    src.textContent='Edited '+formatReviewDate(review.updatedAt);
+    wrap.appendChild(src);
+  }
+  return wrap;
+}
+
+function openReviewModal(review,isMine){
+  const overlay=document.getElementById('reviewModalOverlay');
+  const body=document.getElementById('reviewModalBody');
+  const dialog=document.getElementById('reviewModalDialog');
+  if(!overlay||!body) return;
+  body.innerHTML='';
+  body.appendChild(buildReviewModalContent(review,isMine));
+  if(dialog) dialog.setAttribute('aria-label',review.name+'’s review');
+  overlay.hidden=false;
+  document.body.style.overflow='hidden';
+  document.getElementById('reviewModalClose').focus();
+}
+
+function closeReviewModal(){
+  const overlay=document.getElementById('reviewModalOverlay');
+  if(!overlay||overlay.hidden) return;
+  overlay.hidden=true;
+  document.body.style.overflow='';
+}
+
+document.getElementById('reviewModalClose').addEventListener('click',closeReviewModal);
+document.getElementById('reviewModalOverlay').addEventListener('click',(e)=>{
+  if(e.target.id==='reviewModalOverlay') closeReviewModal();
+});
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape') closeReviewModal();
+});
 
 function updateReviewSummary(){
   const scoreEl=document.getElementById('reviewAvgScore');
@@ -243,6 +322,7 @@ function renderReviews(){
   currentReviews.forEach(review=>{
     rail.appendChild(buildReviewCard(review,Boolean(identity&&identity.id===review.id)));
   });
+  revealOverflowingReadMoreButtons();
 }
 
 function scrollToReview(id){
